@@ -1,12 +1,12 @@
 import React from 'react';
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
-const CocktailListItem = ({item}) => {
+const CocktailListItem = ({item, navigation}) => {
     return (
-        <View style={styles.container}>
+        <TouchableOpacity style={styles.container} onPress={() => {navigation.navigate({name: "details", params: {id: item.idDrink}})}}>
             <Image source={{uri: item.strDrinkThumb}} style={styles.picture}/>
             <Text style={styles.name}>{item.strDrink}</Text>
-        </View>
+        </TouchableOpacity>
     );
 }
 

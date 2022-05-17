@@ -12,6 +12,14 @@ class TheCocktailDBApiService {
         })
     }
 
+    getItemById(id) {
+        return fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`,{ method: 'get' })
+            .then(function(result) {
+                return result.json().then((data) => {
+                    return data.drinks[0]
+                })
+            })
+    }
     getRandom() {
         return fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php", { method: 'get' })
             .then(function(result) {
