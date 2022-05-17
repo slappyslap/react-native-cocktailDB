@@ -1,7 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import {useEffect, useState} from "react";
+import TheCocktailDBApiService from "./src/service/TheCocktailDBApiService";
 
 export default function App() {
+
+  const [cocktailList, setCocktailList] = useState([])
+
+  useEffect(() => {
+    TheCocktailDBApiService.getMultipleItems(5).then((array) => {
+      setCocktailList(array);
+    })
+  }, [])
+
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
