@@ -1,41 +1,43 @@
-import {FlatList, StyleSheet, View} from 'react-native';
+import {FlatList, StyleSheet, Text, View} from 'react-native';
 import {useEffect, useState} from "react";
-import {Text} from "react-native";
-import TheCocktailDBApiService from "../service/TheCocktailDBApiService";
 import CocktailListItem from "../component/CocktailListItem";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import TheCocktailDBApiService from "../service/TheCocktailDBApiService";
 
-export default function CocktailList({navigation}) {
+export default function FavoriteList({navigation}) {
 
     const [cocktailList, setCocktailList] = useState([])
 
     useEffect(() => {
         return navigation.addListener('focus', () => {
-            updateScreen();
+            updateFav();
         });
     }, [navigation])
 
-    const updateScreen = () => {
-        setCocktailList([]);
-        TheCocktailDBApiService.getMultipleItems(20).then((array) => {
-            setCocktailList(array);
-        })
-    }
+    const updateFav = () => {
+        AsyncStorage.getItem('@favList').then((data) => {
+            data = data ? JSON.parse(data) : [];
 
-    const loadMoreCocktail = async () => {
-        const cocktails = await TheCocktailDBApiService.getMultipleItems(6)
-        setCocktailList((m) => {
-            return m.concat(cocktails);
+            let promises = [];
+            for (const item of data) {
+                promises.push(TheCocktailDBApiService.getItemById(item))
+            }
+
+            return Promise.all(promises).then(data => {
+                return data;
+            })
+        }).then(data => {
+            setCocktailList(data);
         });
-    };
+    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.textHeader}>Cocktails</Text>
             <FlatList numColumns={2} data={cocktailList}
                       keyExtractor={(item, index) => item.idDrink }
-                      onEndReached={loadMoreCocktail}
                       renderItem={({item, index}) => {
-                          return (<CocktailListItem item={item} navigation={navigation} key={index}/>)
+                          return (<CocktailListItem item={item} navigation={navigation} key={index} updateFunction={updateFav}/>)
                       }}>
             </FlatList>
         </View>
